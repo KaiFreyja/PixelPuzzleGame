@@ -15,15 +15,21 @@ public class BlockPuzzleMain : MonoBehaviour
 
     void Start()
     {
-        createBlock();
+        if (taregtT2d == null)
+            return;
+
+        CreateBlock();
         RandomPuzzle(100);
+        replaceView();
     }
 
     /// <summary>
     /// 建立拼圖
     /// </summary>
-    private void createBlock()
+    public void CreateBlock()
     {
+        parent.transform.localScale = Vector3.one;
+
         int w = taregtT2d.width;
         int h = taregtT2d.height;
 
@@ -73,15 +79,56 @@ public class BlockPuzzleMain : MonoBehaviour
 
                 // 加入點擊事件
                 Button btn = g.AddComponent<Button>();
+
+                ColorBlock cb = btn.colors;
+                cb.disabledColor = Color.white;
+                btn.colors = cb;
+
                 btn.onClick.AddListener(() => pieceScript.TryMove());
             }
         }
+        replaceView();
+    }
+
+    /// <summary>
+    /// 調整大小已對齊螢幕
+    /// </summary>
+    private void replaceView()
+    {
+
+        if (!this.taregtT2d || !this.parent)
+            return;
+
+        float texWidth = taregtT2d.width;
+        float texHeight = taregtT2d.height;
+
+        float screenWidth = Screen.width;
+        float screenHeight = Screen.height;
+
+        // 計算圖片與螢幕的寬高比
+        float texRatio = texWidth / texHeight;
+        float screenRatio = screenWidth / screenHeight;
+
+        float scale = 1;
+
+        if (screenRatio > texRatio)
+        {
+            // 螢幕比較寬，依高度縮放
+            scale = screenHeight / texHeight;
+        }
+        else
+        {
+            // 螢幕比較窄，依寬度縮放
+            scale = screenWidth / texWidth;
+        }
+
+        this.parent.transform.localScale = new Vector3(scale, scale, 1);
     }
 
     /// <summary>
     /// 隨機拼圖
     /// </summary>
-    private void RandomPuzzle(int times)
+    public void RandomPuzzle(int times)
     {
         for (int i = 0; i < times; i++)
         {
@@ -104,6 +151,24 @@ public class BlockPuzzleMain : MonoBehaviour
             }
         }
 
+    }
+
+    public void Clear()
+    {
+        var childs = new List<GameObject>();
+        for (int i = 0; i < parent.transform.childCount; i++)
+        {
+            childs.Add(parent.transform.GetChild(i).gameObject);
+        }
+        foreach (var a in childs)
+        {
+            GameObject.Destroy(a);
+        }
+
+        parent.transform.localScale = Vector3.one;
+        grid = null;
+        blocks = null;
+        emptySlot = Vector2Int.zero;
     }
 
     // 嘗試移動某個拼圖
@@ -170,11 +235,16 @@ public class BlockPuzzleMain : MonoBehaviour
         }
     }
 
-    public void openAll()
+    private void openAll()
     {
         foreach (var a in blocks)
         {
-            a.transform.GetChild(0).gameObject.SetActive(true);
+            var g = a.transform.GetChild(0).gameObject;
+            g.SetActive(true);
+            if (g.GetComponent<Button>() != null)
+            {
+                g.GetComponent<Button>().interactable = false;
+            }
         }
     }
 }
