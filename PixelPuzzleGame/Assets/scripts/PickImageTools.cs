@@ -31,7 +31,7 @@ public class PickImageTools : MonoBehaviour
 #elif UNITY_ANDROID
     PickImageAndroid();
 #elif UNITY_IOS
-
+    PickImageIos();
 #else
 
 #endif
@@ -47,6 +47,14 @@ public class PickImageTools : MonoBehaviour
         }
     }
 
+    private void PickImageIos()
+    {
+        IOSCamera.PickFromGallery();
+    }
+    public void OnPictureTaken(string path)
+    {
+        OnImagePicked(path);
+    }
     public void OnImagePicked(string path)
     {
         Debug.Log("OnImagePicked : " + path);

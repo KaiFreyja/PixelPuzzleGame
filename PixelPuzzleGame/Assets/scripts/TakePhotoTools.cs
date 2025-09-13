@@ -31,7 +31,7 @@ public class TakePhotoTools : MonoBehaviour
 #elif UNITY_ANDROID
     TakePhotoAndroid();
 #elif UNITY_IOS
-
+    TakePhotoIos();
 #else
 
 #endif
@@ -45,6 +45,12 @@ public class TakePhotoTools : MonoBehaviour
             AndroidJavaClass pluginClass = new AndroidJavaClass("com.kai.unityplugin.NativeBridge");
             pluginClass.CallStatic("takePicture");
         }
+    }
+
+    private void TakePhotoIos()
+    {
+        Debug.Log("ios take photo ios");
+        IOSCamera.TakePicture();
     }
 
     /// <summary>
